@@ -19,7 +19,54 @@ class ProjectController extends Controller
 
 	public function actionIndex()
 	{
-		$this->render('index');
+		$rawData = array();
+
+		$dirindex = scandir('/srv/git');
+		foreach($dirindex as $diritem) {
+			switch ($diritem) {
+				case '.':
+				case '..':
+					break;
+				default:
+					$prjstruct = scandir('/srv/git/'.$diritem);
+
+			if ($prjstruct &&
+					(array_search('branches', $prjstruct)) &&
+					(array_search('config', $prjstruct)) &&
+					(array_search('description', $prjstruct)) &&
+					(array_search('HEAD', $prjstruct)) &&
+					(array_search('hooks', $prjstruct)) &&
+					(array_search('info', $prjstruct)) &&
+					(array_search('objects', $prjstruct)) &&
+					(array_search('refs', $prjstruct))
+					) {
+						print_r($prjstruct);
+						array_push($rawData, array('id'=>$diritem));
+					}
+
+					break;
+
+			}
+
+
+		}
+
+
+		$project_list = new CArrayDataProvider(
+			/*$rawData*/ array(
+				'id'=>'gitsrv', 'owner'=>'root','group'=>'users'
+			),
+			array(
+				/*/
+				'sort'=>array(
+					'id', 'owner', 'group'
+				),/*/
+				'pagination'=>array(
+					'pageSize'=>10,
+				),
+			)
+		);
+		$this->render('index', array('prjlist'=>$project_list));
 	}
 
 	public function actionView()

@@ -2,8 +2,8 @@
 /* @var $this ProjectController */
 
 $this->breadcrumbs=array(
-	'Project'=>array('/project'),
-	'Webgit',
+	'Проекты'=>array('/project'),
+	'WebGit',
 );
 ?>
 

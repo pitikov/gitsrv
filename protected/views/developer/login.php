@@ -10,8 +10,8 @@
 	'id'=>'login-form-login-form',
 	'enableAjaxValidation'=>false,
 )); ?>
-
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+<h1>Авторизация пользователя</h1>
+	<p class="note">Поля, отмеченные <span class="required">*</span>, обязательны для заполнения.</p>
 
 	<?php echo $form->errorSummary($model); ?>
 
@@ -34,7 +34,7 @@
 
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Submit'); ?>
+		<?php echo CHtml::submitButton('Авторизация'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>
