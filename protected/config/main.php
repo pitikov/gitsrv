@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'Управление сервреом GIT',
+	'name'=>'Управление сервером GIT',
 
 	// preloading 'log' component
 	'preload'=>array('log'),
@@ -22,7 +22,7 @@ return array(
 		// uncomment the following to enable the Gii tool
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
+			'password'=>'gitadmin',
 			// If removed, Gii defaults to localhost only. Edit carefully to taste.
 			'ipFilters'=>array('127.0.0.1','::1'),
 		),
@@ -58,7 +58,7 @@ return array(
 		*/
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
-			'errorAction'=>'site/error',
+			'errorAction'=>'developer/error',
 		),
 		'log'=>array(
 			'class'=>'CLogRouter',
@@ -83,5 +83,6 @@ return array(
 		// this is used in contact page
 		'adminEmail'=>'pitikov@yandex.ru',
 	),
-	'language'=>'ru'
+	'language'=>'ru',
+	'defaultController'=>'developer'
 );
