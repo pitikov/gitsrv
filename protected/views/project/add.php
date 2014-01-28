@@ -28,13 +28,13 @@ $this->breadcrumbs=array(
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'owner'); ?>
-		<?php echo $form->textField($model,'owner'); ?>
+		<?php echo $form->dropdownlist($model,'owner', $model->ownerList()); ?>
 		<?php echo $form->error($model,'owner'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'group'); ?>
-		<?php echo $form->textField($model,'group'); ?>
+		<?php echo $form->dropdownlist($model,'group', $model->groupList()); ?>
 		<?php echo $form->error($model,'group'); ?>
 	</div>
 

@@ -5,22 +5,24 @@ class ProjectController extends Controller
 	public function actionAdd()
 	{
 		$model = new ProjectForm('create');
-		
+		$model->owner = Yii::app()->params['default_owner'];
+		$model->group = Yii::app()->params['default_group'];
+
 		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-add-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
-		
+
 		if (isset($_POST['ProjectForm']))
 		{
 			$model->attributes=$_POST['ProjectForm'];
 			if ($model->validate())
 			{
-				exec('cd /srv/git/ && sudo git init --bare '.$model->project);
-				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' /srv/git/'.$model->project.' -Rf');
-				exec('sudo /usr/bin/chmod g+rwx /srv/git/'.$model->project.' -Rf');
-				exec('sudo /usr/bin/chmod 777 /srv/git/'.$model->project.'/description -Rf');
-				exec('sudo echo '.$model->description.' > /srv/git/'.$model->project.'/description');
+				exec('cd '.Yii::app()->params['gitsrv_root'].' && sudo git init --bare '.$model->project);
+				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod g+rwx '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod 777 '.Yii::app()->params['gitsrv_root'].$model->project.'/description -Rf');
+				exec('sudo echo '.$model->description.' > '.Yii::app()->params['gitsrv_root'].$model->project.'/description');
 				// TODO implict me
 				$this->redirect(array('/project'));
 			}
@@ -30,50 +32,53 @@ class ProjectController extends Controller
 
 	public function actionDelete($project)
 	{
-		exec('sudo rm -Rf /srv/git/'.$project);
+		exec('sudo rm -Rf '.Yii::app()->params['gitsrv_root'].$project);
 		$this->redirect(array('/project'));
 	}
 
-	public function actionEdit()
+	public function actionEdit($project)
 	{
-			{
 		$model = new ProjectForm('create');
-		
+
+		$model->project = $project;
+		$model->description = file_get_contents(Yii::app()->params['gitsrv_root'].$project.'/description');
+		$model->owner = posix_getpwuid(fileowner(Yii::app()->params['gitsrv_root'].$project))['name'];
+		$model->group = posix_getgrgid(filegroup(Yii::app()->params['gitsrv_root'].$project))['name'];
+
 		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-edit-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
-		
+
 		if (isset($_POST['ProjectForm']))
 		{
 			$model->attributes=$_POST['ProjectForm'];
 			if ($model->validate())
 			{
 				//exec('cd /srv/git/ && sudo git init --bare '.$model->project);
-				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' /srv/git/'.$model->project.' -Rf');
-				exec('sudo /usr/bin/chmod g+rwx /srv/git/'.$model->project.' -Rf');
-				exec('sudo /usr/bin/chmod 777 /srv/git/'.$model->project.'/description -Rf');
-				exec('sudo echo '.$model->description.' > /srv/git/'.$model->project.'/description');
+				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod g+rwx '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod 777 '.Yii::app()->params['gitsrv_root'].$model->project.'/description -Rf');
+				exec('sudo echo '.$model->description.' > '.Yii::app()->params['gitsrv_root'].$model->project.'/description');
 				// TODO implict me
 				$this->redirect(array('/project'));
 			}
 		}
 		$this->render('edit', array('model'=>$model));
 	}
-	}
 
 	public function actionIndex()
 	{
 		$rawData = array();
 
-		$dirindex = scandir('/srv/git');
+		$dirindex = scandir(Yii::app()->params['gitsrv_root']);
 		foreach($dirindex as $diritem) {
 			switch ($diritem) {
 				case '.':
 				case '..':
 					break;
 				default:
-					$prjstruct = scandir('/srv/git/'.$diritem);
+					$prjstruct = scandir(Yii::app()->params['gitsrv_root'].$diritem);
 
 			if ($prjstruct &&
 					(array_search('branches', $prjstruct)) &&
@@ -85,10 +90,10 @@ class ProjectController extends Controller
 					(array_search('objects', $prjstruct)) &&
 					(array_search('refs', $prjstruct))
 					) {
-						$owner = posix_getpwuid(fileowner('/srv/git/'.$diritem))['name'];
-						$group = posix_getgrgid(filegroup('/srv/git/'.$diritem))['name'];
-						
-						$description = file_get_contents('/srv/git/'.$diritem.'/description');
+						$owner = posix_getpwuid(fileowner(Yii::app()->params['gitsrv_root'].$diritem))['name'];
+						$group = posix_getgrgid(filegroup(Yii::app()->params['gitsrv_root'].$diritem))['name'];
+
+						$description = file_get_contents(Yii::app()->params['gitsrv_root'].$diritem.'/description');
 						array_push($rawData, array('id'=>$diritem,  'owner'=>$owner,  'group'=>$group, 'description'=>$description));
 					}
 					break;

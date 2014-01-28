@@ -82,6 +82,11 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'pitikov@yandex.ru',
+		'gitsrv_root'=>'/srv/git/',
+		'default_owner'=>'wwwrun',
+		'default_group'=>'users',
+		'min_uid'=>1000,
+		'min_gid'=>100,
 	),
 	'language'=>'ru',
 	'defaultController'=>'project'
