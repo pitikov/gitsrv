@@ -40,27 +40,20 @@ class ProjectController extends Controller
 					(array_search('objects', $prjstruct)) &&
 					(array_search('refs', $prjstruct))
 					) {
-						print_r($prjstruct);
-						array_push($rawData, array('id'=>$diritem));
+						$owner = posix_getpwuid(fileowner('/srv/git/'.$diritem))['name'];
+						$group = posix_getgrgid(filegroup('/srv/git/'.$diritem))['name'];
+						
+						$description = file_get_contents('/srv/git/'.$diritem.'/description');
+						array_push($rawData, array('id'=>$diritem,  'owner'=>$owner,  'group'=>$group, 'description'=>$description));
 					}
-
 					break;
-
 			}
-
-
 		}
 
 
 		$project_list = new CArrayDataProvider(
-			/*$rawData*/ array(
-				'id'=>'gitsrv', 'owner'=>'root','group'=>'users'
-			),
+			$rawData,
 			array(
-				/*/
-				'sort'=>array(
-					'id', 'owner', 'group'
-				),/*/
 				'pagination'=>array(
 					'pageSize'=>10,
 				),
