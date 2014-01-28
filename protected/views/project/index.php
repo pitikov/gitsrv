@@ -14,7 +14,7 @@ $this->breadcrumbs=array(
       array(
           'name'=>'id',
           'header'=>'Проект',
-          'class'=>'ProjectColumn'
+          'class'=>'ProjectColumn',
       ),
       array(
           'name'=>'owner',
@@ -28,6 +28,13 @@ $this->breadcrumbs=array(
           'name'=>'description',
           'header'=>'Описание',
       ),
-		)
+			array(
+          'name'=>'id',
+          'header'=>'',
+          'class'=>'ProjectCtrlColumn',
+      ),
+		),
+		'template'=>'{summary}{pager}{items}{pager}{summary}',
+		'summaryText'=>CHtml::link('Создать', array('/project/add')).' Проекты {start}-{end} из {count}',
 	));
 ?>

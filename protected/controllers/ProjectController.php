@@ -4,17 +4,62 @@ class ProjectController extends Controller
 {
 	public function actionAdd()
 	{
-		$this->render('add');
+		$model = new ProjectForm('create');
+		
+		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-add-form') {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+		
+		if (isset($_POST['ProjectForm']))
+		{
+			$model->attributes=$_POST['ProjectForm'];
+			if ($model->validate())
+			{
+				exec('cd /srv/git/ && sudo git init --bare '.$model->project);
+				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' /srv/git/'.$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod g+rwx /srv/git/'.$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod 777 /srv/git/'.$model->project.'/description -Rf');
+				exec('sudo echo '.$model->description.' > /srv/git/'.$model->project.'/description');
+				// TODO implict me
+				$this->redirect(array('/project'));
+			}
+		}
+		$this->render('add', array('model'=>$model));
 	}
 
-	public function actionDelete()
+	public function actionDelete($project)
 	{
-		$this->render('delete');
+		exec('sudo rm -Rf /srv/git/'.$project);
+		$this->redirect(array('/project'));
 	}
 
 	public function actionEdit()
 	{
-		$this->render('edit');
+			{
+		$model = new ProjectForm('create');
+		
+		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-edit-form') {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+		
+		if (isset($_POST['ProjectForm']))
+		{
+			$model->attributes=$_POST['ProjectForm'];
+			if ($model->validate())
+			{
+				//exec('cd /srv/git/ && sudo git init --bare '.$model->project);
+				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' /srv/git/'.$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod g+rwx /srv/git/'.$model->project.' -Rf');
+				exec('sudo /usr/bin/chmod 777 /srv/git/'.$model->project.'/description -Rf');
+				exec('sudo echo '.$model->description.' > /srv/git/'.$model->project.'/description');
+				// TODO implict me
+				$this->redirect(array('/project'));
+			}
+		}
+		$this->render('edit', array('model'=>$model));
+	}
 	}
 
 	public function actionIndex()
@@ -55,16 +100,11 @@ class ProjectController extends Controller
 			$rawData,
 			array(
 				'pagination'=>array(
-					'pageSize'=>10,
+					'pageSize'=>50,
 				),
 			)
 		);
 		$this->render('index', array('prjlist'=>$project_list));
-	}
-
-	public function actionView()
-	{
-		$this->render('view');
 	}
 
 	public function actionWebgit($project = '')

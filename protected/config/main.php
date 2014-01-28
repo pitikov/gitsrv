@@ -24,7 +24,7 @@ return array(
 			'class'=>'system.gii.GiiModule',
 			'password'=>'gitadmin',
 			// If removed, Gii defaults to localhost only. Edit carefully to taste.
-			'ipFilters'=>array('127.0.0.1','::1'),
+			'ipFilters'=>array('127.0.0.1','::1','172.19.123.1'),
 		),
 	),
 
@@ -84,5 +84,5 @@ return array(
 		'adminEmail'=>'pitikov@yandex.ru',
 	),
 	'language'=>'ru',
-	'defaultController'=>'developer'
+	'defaultController'=>'project'
 );
