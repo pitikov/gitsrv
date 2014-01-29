@@ -67,11 +67,9 @@ class DeveloperController extends Controller
         $model->attributes=$_POST['LoginForm'];
         if($model->validate() && $model->login())
         {
-
-					;
-						$this->redirect($this->createUrl('/project/index'));
-            // form inputs are valid, do something here
-            return;
+					$this->redirect($this->createUrl('/project/index'));
+					// form inputs are valid, do something here
+          return;
         }
     }
     $this->render('login',array('model'=>$model));

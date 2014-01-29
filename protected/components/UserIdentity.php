@@ -15,19 +15,15 @@ class UserIdentity extends CUserIdentity
 	 * against some persistent user identity storage (e.g. database).
 	 * @return boolean whether authentication succeeds.
 	 */
+	 
 	public function authenticate()
 	{
-		$users=array(
-			// username => password
-			'demo'=>'demo',
-			'admin'=>'admin',
-		);
-		if(!isset($users[$this->username]))
-			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		else if($users[$this->username]!==$this->password)
-			$this->errorCode=self::ERROR_PASSWORD_INVALID;
-		else
+		$token = explode ( ":", exec( "sudo grep $this->username /etc/shadow"))[1];
+		if ($token == crypt($this->password, $token)) {
 			$this->errorCode=self::ERROR_NONE;
+		} else {
+			$this->errorCode=self::ERROR_PASSWORD_INVALID;
+		}
 		return !$this->errorCode;
 	}
 }

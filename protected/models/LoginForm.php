@@ -23,6 +23,7 @@ class LoginForm extends CFormModel
 		return array(
 			// username and password are required
 			array('username, password', 'required'),
+			array('username', 'isexists'),
 			// rememberMe needs to be a boolean
 			array('rememberMe', 'boolean'),
 			// password needs to be authenticated
@@ -52,7 +53,7 @@ class LoginForm extends CFormModel
 		{
 			$this->_identity=new UserIdentity($this->username,$this->password);
 			if(!$this->_identity->authenticate())
-				$this->addError('password','Ошибка в имени пользователея или пароле.');
+				$this->addError('password','Ошибка при вводе пароля');
 		}
 	}
 
@@ -70,10 +71,29 @@ class LoginForm extends CFormModel
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
 		{
 			$duration=$this->rememberMe ? 3600*24*30 : 0; // 30 days
-			Yii::app()->user->login($this->_identity,$duration);
+			Yii::app()->user->login($this->_identity, $duration);
+			Yii::app()->user->setId(posix_getpwnam($this->username)['uid']);
 			return true;
-		}
-		else
+		} else {
 			return false;
+		}
+	}
+	
+	public function isexists()
+	{
+		$userlist = array();
+		$pwdfile = fopen('/etc/passwd','r');
+		if ($pwdfile) {
+			while (!feof($pwdfile)) {
+			  $userstruct = explode(':',fgets($pwdfile, 512));
+			  if ($userstruct) {
+					array_push($userlist, $userstruct[0]);
+			  }
+			}
+			fclose($pwdfile);
+			if (array_search($this->username, $userlist)===FALSE) {
+				$this->addError($this->username, "Пользователь $this->username не существует");
+			}
+		}
 	}
 }
