@@ -2,6 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+	<link rel="SHORTCUT ICON" href="/images/git.png" type="image/png">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="language" content="en" />
 
@@ -32,8 +33,10 @@
 				array('label'=>'Разработчики', 'url'=>array('/developer/index'), 'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'Проекты', 'url'=>array('/project/index'), 'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'webgit', 'url'=>array('/project/webgit'), 'visible'=>!Yii::app()->user->isGuest),
-				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/developer/logout'),
-				'visible'=>!Yii::app()->user->isGuest)
+				array('label'=>'Профиль ('.Yii::app()->user->name.')', 'url'=>array('/developer/profile'),
+				'visible'=>!Yii::app()->user->isGuest),
+				array('label'=>'Выйти', 'url'=>array('/developer/logout'),
+				'visible'=>!Yii::app()->user->isGuest, 'linkOptions'=>array('confirm'=>'Завершить сеанс пользователя '.Yii::app()->user->name.'?'))
 			),
 		)); ?>
 	</div><!-- mainmenu -->
