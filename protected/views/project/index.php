@@ -35,6 +35,6 @@ $this->breadcrumbs=array(
       ),
 		),
 		'template'=>'{summary}{pager}{items}{pager}{summary}',
-		'summaryText'=>CHtml::link('Создать', array('/project/add')).' Проекты {start}-{end} из {count}',
+		'summaryText'=>CHtml::link('<img title="Создать проект" src="/images/new.png"/>', array('/project/add')).' Проекты {start}-{end} из {count}',
 	));
 ?>
