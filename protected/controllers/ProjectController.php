@@ -5,8 +5,8 @@ class ProjectController extends Controller
 	public function actionAdd()
 	{
 		$model = new ProjectForm('create');
-		$model->owner = Yii::app()->params['default_owner'];
-		$model->group = Yii::app()->params['default_group'];
+		$model->owner = Yii::app()->user->name;
+		$model->group = posix_getgrgid(posix_getpwnam($model->owner)['gid'])['name'];
 
 		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-add-form') {
 			echo CActiveForm::validate($model);

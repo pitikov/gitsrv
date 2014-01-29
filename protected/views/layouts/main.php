@@ -53,7 +53,7 @@
 	<div id="footer">
 		Copyright &copy; 2014 by <?php echo CHtml::link('Pitikov Evgeniy', 'mailto:pitikov@yandex.ru')?>.<br/>
 		All Rights Reserved.<br/>
-		<?php echo Yii::powered(); ?>
+		<?php echo Yii::powered();?>
 	</div><!-- footer -->
 
 </div><!-- page -->

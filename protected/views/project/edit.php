@@ -19,8 +19,9 @@ $this->breadcrumbs=array(
 	<?php echo $form->errorSummary($model); ?>
 
 	<div class="row">
+	<?php $is_owner_edit = ($model->owner==Yii::app()->user->name) | (Yii::app()->user->getId()==0);?>
 		<?php echo $form->labelEx($model,'owner'); ?>
-		<?php echo $form->dropdownlist($model,'owner', $model->ownerList()); ?>
+		<?php echo $is_owner_edit?$form->dropdownlist($model,'owner', $model->ownerList()):$model->owner; ?>
 		<?php echo $form->error($model,'owner'); ?>
 	</div>
 
@@ -29,7 +30,7 @@ $this->breadcrumbs=array(
 		<?php echo $form->dropdownlist($model,'group', $model->groupList()); ?>
 		<?php echo $form->error($model,'group'); ?>
 	</div>
-	
+
 	<div class="row">
 		<?php echo $form->labelEx($model,'description'); ?>
 		<?php echo $form->textField($model,'description'); ?>

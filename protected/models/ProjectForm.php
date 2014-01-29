@@ -39,15 +39,6 @@ class ProjectForm extends CFormModel
 		);
 	}
 
-	public function create()
-	{
-	}
-
-	public function edit()
-	{
-
-	}
-
 	public function ownerList()
 	{
 		$owner_list = array();
@@ -56,12 +47,13 @@ class ProjectForm extends CFormModel
 			while (!feof($pwdfile)) {
 				$entry = explode (':', fgets($pwdfile, 512));
 				if (count($entry)>2) {
-					if ($entry[2]>= Yii::app()->params['min_uid']) array_push($owner_list, array($entry[0]=>$entry[0]));
+					if ($entry[2]>= Yii::app()->params['min_uid']) array_push($owner_list, $entry[0]);
 				}
 			}
 			fclose($pwdfile);
 		}
-		return $owner_list;
+		if (!in_array(Yii::app()->user->name, $owner_list, true)) array_push($owner_list, Yii::app()->user->name);
+		return array_combine($owner_list, $owner_list);
 	}
 
 	public function groupList()
@@ -72,16 +64,18 @@ class ProjectForm extends CFormModel
 			while (!feof($groupfile)) {
 				$entry = explode (':', fgets($groupfile, 512));
 				if (count($entry)>2) {
-					if ($entry[2]>= Yii::app()->params['min_gid']) array_push($group_list, array($entry[0]=>$entry[0]));
+					if ($entry[2]>= Yii::app()->params['min_gid']) array_push($group_list, $entry[0]);
 				}
 			}
 			fclose($groupfile);
-			if ($this->is_group_create) array_push($group_list, array('git_'.$this->project=>'git_'.$this->project));
-			if (array_search('users', $group_list)===FALSE) array_push($group_list, array('users'=>'users'));
+			if ($this->is_group_create) array_push($group_list, 'git_'.$this->project);
 		}
-		return $group_list;
+		$usergroup = trim(posix_getgrgid(posix_getpwuid(Yii::app()->user->getId())['gid'])['name']);
+		if (!in_array($usergroup, $group_list, true)) array_push($group_list, $usergroup);
+		return array_combine($group_list, $group_list);
+
 	}
-	
+
 	public function project_unique()
 	{
 		if(!$this->hasErrors())
@@ -93,16 +87,16 @@ class ProjectForm extends CFormModel
 			}
 		}
 	}
-	
+
 	public function groupadd()
 	{
 		$this->group = $this->is_group_create ? 'git_'.$this->project:$this->group;
 	}
-	
+
 	public function groupexists($group)
 	{
 		if (posix_getgrnam($group)===FALSE) {
-			return FALSE;			
+			return FALSE;
 		} else {
 			return TRUE;
 		}
