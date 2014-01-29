@@ -5,7 +5,24 @@ class DeveloperController extends Controller
 
 	public function actionAdd()
 	{
-		$this->render('add');
+    $model=new DeveloperForm('useradd');
+
+    if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-add-form')
+    {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+    }
+
+    if(isset($_POST['DeveloperForm']))
+    {
+			$model->attributes=$_POST['DeveloperForm'];
+			if($model->validate())
+			{
+				// TODO form inputs are valid, do something here
+				$this->redirect(array('/developer'));
+			}
+    }
+    $this->render('add',array('model'=>$model));
 	}
 
 	public function actionDelete()

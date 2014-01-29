@@ -2,12 +2,23 @@
 /* @var $this DeveloperController */
 
 $this->breadcrumbs=array(
-	'Developer',
+	'Разработчики',
 );
 ?>
-<h1><?php echo $this->id . '/' . $this->action->id; ?></h1>
+<h1>Разработчики и группы</h1>
+<?php
 
-<p>
-	You may change the content of this page by modifying
-	the file <tt><?php echo __FILE__; ?></tt>.
-</p>
+
+$this->widget('zii.widgets.jui.CJuiTabs', array(
+    'tabs'=>array(
+        'Разработчики'=>array('content'=>'Таблица пользователей', 'id'=>'developers'),
+        'Группы'=>array('content'=>'Таблица групп', 'id'=>'groups'),
+
+
+    ),
+    'options'=>array(
+        'collapsible'=>true,
+    ),
+));
+
+?>
