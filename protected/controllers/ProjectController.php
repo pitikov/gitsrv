@@ -19,7 +19,7 @@ class ProjectController extends Controller
 			$model->attributes=$_POST['ProjectForm'];
 			if ($model->validate())
 			{
-				if ($model->is_group_create & $model->groupexists($model->group)) {
+				if ($model->is_group_create & !$model->groupexists($model->group)) {
 					exec('sudo /usr/sbin/groupadd '.$model->group);
 				}
 
