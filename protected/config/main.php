@@ -86,7 +86,7 @@ return array(
 		'default_owner'=>'wwwrun',
 		'default_group'=>'users',
 		'min_uid'=>1000,
-		'min_gid'=>100,
+		'min_gid'=>1000,
 	),
 	'language'=>'ru',
 	'defaultController'=>'project'

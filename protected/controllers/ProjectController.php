@@ -10,6 +10,7 @@ class ProjectController extends Controller
 
 		if (isset($_POST['ajax']) && $_POST['ajax']==='project-form-add-form') {
 			echo CActiveForm::validate($model);
+			$model->project_unique();
 			Yii::app()->end();
 		}
 
@@ -18,12 +19,15 @@ class ProjectController extends Controller
 			$model->attributes=$_POST['ProjectForm'];
 			if ($model->validate())
 			{
+				if ($model->is_group_create & $model->groupexists($model->group)) {
+					exec('sudo /usr/sbin/groupadd '.$model->group);
+				}
+
 				exec('cd '.Yii::app()->params['gitsrv_root'].' && sudo git init --bare '.$model->project);
 				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
 				exec('sudo /usr/bin/chmod g+rwx '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
 				exec('sudo /usr/bin/chmod 777 '.Yii::app()->params['gitsrv_root'].$model->project.'/description -Rf');
 				exec('sudo echo '.$model->description.' > '.Yii::app()->params['gitsrv_root'].$model->project.'/description');
-				// TODO implict me
 				$this->redirect(array('/project'));
 			}
 		}
@@ -38,7 +42,7 @@ class ProjectController extends Controller
 
 	public function actionEdit($project)
 	{
-		$model = new ProjectForm('create');
+		$model = new ProjectForm('edit');
 
 		$model->project = $project;
 		$model->description = file_get_contents(Yii::app()->params['gitsrv_root'].$project.'/description');
@@ -55,12 +59,10 @@ class ProjectController extends Controller
 			$model->attributes=$_POST['ProjectForm'];
 			if ($model->validate())
 			{
-				//exec('cd /srv/git/ && sudo git init --bare '.$model->project);
 				exec('sudo /usr/bin/chown '.$model->owner.':'.$model->group.' '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
 				exec('sudo /usr/bin/chmod g+rwx '.Yii::app()->params['gitsrv_root'].$model->project.' -Rf');
 				exec('sudo /usr/bin/chmod 777 '.Yii::app()->params['gitsrv_root'].$model->project.'/description -Rf');
 				exec('sudo echo '.$model->description.' > '.Yii::app()->params['gitsrv_root'].$model->project.'/description');
-				// TODO implict me
 				$this->redirect(array('/project'));
 			}
 		}

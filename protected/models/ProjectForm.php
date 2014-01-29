@@ -18,7 +18,8 @@ class ProjectForm extends CFormModel
 	{
 		return array(
 			array('project, owner, group, description', 'required'),
-			//array('is_group_create', 'bool'),
+			array('project', 'project_unique', 'on'=>'create'),
+			array('is_group_create', 'groupadd', 'on'=>'create'),
 		);
 	}
 
@@ -75,8 +76,35 @@ class ProjectForm extends CFormModel
 				}
 			}
 			fclose($groupfile);
+			if ($this->is_group_create) array_push($group_list, array('git_'.$this->project=>'git_'.$this->project));
+			if (array_search('users', $group_list)===FALSE) array_push($group_list, array('users'=>'users'));
 		}
 		return $group_list;
 	}
-
+	
+	public function project_unique()
+	{
+		if(!$this->hasErrors())
+		{
+			$repolist = scandir(Yii::app()->params['gitsrv_root']);
+			if (array_search($this->project, $repolist)===FALSE) {
+			} else {
+				$this->addError('project', 'Название проекта должно быть уникальным');
+			}
+		}
+	}
+	
+	public function groupadd()
+	{
+		$this->group = $this->is_group_create ? 'git_'.$this->project:$this->group;
+	}
+	
+	public function groupexists($group)
+	{
+		if (posix_getgrnam($group)===FALSE) {
+			return FALSE;			
+		} else {
+			return TRUE;
+		}
+	}
 }
