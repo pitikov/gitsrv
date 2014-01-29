@@ -45,6 +45,43 @@ class DeveloperController extends Controller
 		$this->render('view');
 	}
 
+	public function actionProfile()
+	{
+    $model=new DeveloperForm('usermod');
+
+    $userinfo = posix_getpwuid(Yii::app()->user->getId());
+
+    $model->login = $userinfo['name'];
+    $model->username = $userinfo['gecos'];
+
+    $model->password = '';
+    $model->password_duplicate = '';
+
+    if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-profile-form')
+    {
+        echo CActiveForm::validate($model);
+        Yii::app()->end();
+    }
+
+    if(isset($_POST['DeveloperForm']))
+    {
+        $model->attributes=$_POST['DeveloperForm'];
+        if($model->validate())
+        {
+
+					if (!is_null($model->password)) {
+						exec("echo {$model->login}:{$model->password} | sudo /usr/sbin/chpasswd");
+					}
+					exec("sudo /usr/sbin/usermod -c '$model->username' $model->login");
+					// form inputs are valid, do something here
+          Yii::app()->user->setFlash('success','Данные пользователя обновленны');
+					$this->refresh();
+          //$this->redirect($this->createUrl('/developer/profile'));
+        }
+    }
+    $this->render('profile',array('model'=>$model));
+	}
+
 	public function actionLogout()
 	{
     Yii::app()->user->logout();

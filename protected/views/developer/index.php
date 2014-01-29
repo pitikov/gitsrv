@@ -9,16 +9,20 @@ $this->breadcrumbs=array(
 <?php
 
 
-$this->widget('zii.widgets.jui.CJuiTabs', array(
-    'tabs'=>array(
-        'Разработчики'=>array('content'=>'Таблица пользователей', 'id'=>'developers'),
-        'Группы'=>array('content'=>'Таблица групп', 'id'=>'groups'),
+$this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Разработчики')); ?>
+<?php $this->endWidget(); ?>
+
+<?php $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Группы')); ?>
+<?php $this->endWidget(); ?>
+
+<?php
 
 
-    ),
-    'options'=>array(
-        'collapsible'=>true,
-    ),
-));
+    $tabParameters = array();
+    foreach($this->clips as $key=>$clip)
+        $tabParameters['tab'.(count($tabParameters)+1)] = array('title'=>$key, 'content'=>$clip); // !!
+    ?>
 
-?>
+    <?php $this->widget('system.web.widgets.CTabView', array('tabs'=>$tabParameters)); ?>
+
+
