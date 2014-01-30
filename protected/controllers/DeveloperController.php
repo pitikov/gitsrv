@@ -56,6 +56,15 @@ class DeveloperController extends Controller
 
     $model->password = '';
     $model->password_duplicate = '';
+    $model->grouplist=array();
+    $usrglist = array();
+    
+
+    foreach(explode(" ", exec("id -G $model->login")) as $group) {
+			array_push($usrglist, posix_getgrgid($group)['name']);
+    }
+    
+    $model->grouplist = array_fill_keys($usrglist, true);
 
     if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-profile-form')
     {
@@ -72,11 +81,20 @@ class DeveloperController extends Controller
 					if (!is_null($model->password)) {
 						exec("echo {$model->login}:{$model->password} | sudo /usr/sbin/chpasswd");
 					}
-					exec("sudo /usr/sbin/usermod -c '$model->username' $model->login");
-					// form inputs are valid, do something here
+					$glist = '';
+
+					foreach(array_keys($model->grouplist) as $key) {
+						if ($model->grouplist[$key]==TRUE) {
+							if ($glist == '') {
+								$glist = "-G {$key}";
+							} else {
+								$glist = $glist.",{$key}";
+							}
+						}
+					}
+					exec("sudo /usr/sbin/usermod -c '{$model->username}' {$glist} {$model->login}");
           Yii::app()->user->setFlash('success','Данные пользователя обновленны');
 					$this->refresh();
-          //$this->redirect($this->createUrl('/developer/profile'));
         }
     }
     $this->render('profile',array('model'=>$model));
@@ -92,7 +110,6 @@ class DeveloperController extends Controller
 	{
 		$model=new LoginForm('login');
 
-    // uncomment the following code to enable ajax-based validation
     if(isset($_POST['ajax']) && $_POST['ajax']==='login-form-login-form')
     {
         echo CActiveForm::validate($model);
@@ -105,16 +122,12 @@ class DeveloperController extends Controller
         if($model->validate() && $model->login())
         {
 					$this->redirect($this->createUrl('/project/index'));
-					// form inputs are valid, do something here
           return;
         }
     }
     $this->render('login',array('model'=>$model));
 	}
 
-	  /**
-   * This is the action to handle external exceptions.
-   */
   public function actionError()
   {
     if($error=Yii::app()->errorHandler->error)
@@ -125,31 +138,4 @@ class DeveloperController extends Controller
 	$this->render('error', $error);
     }
   }
-
-	// Uncomment the following methods and override them if needed
-	/*
-	public function filters()
-	{
-		// return the filter configuration for this controller, e.g.:
-		return array(
-			'inlineFilterName',
-			array(
-				'class'=>'path.to.FilterClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
-	}
-
-	public function actions()
-	{
-		// return external action classes, e.g.:
-		return array(
-			'action1'=>'path.to.ActionClass',
-			'action2'=>array(
-				'class'=>'path.to.AnotherActionClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
-	}
-	*/
 }
