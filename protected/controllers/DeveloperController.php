@@ -317,11 +317,9 @@ class DeveloperController extends Controller
 					}
 					exec("sudo /usr/sbin/usermod -c '{$model->username}' {$glist} {$model->login}");
 
-					die($model->rsa_key);
 					if (strlen($model->rsa_key)>0) {
 						$sshdir = posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh";
 						mkdir($sshdir);
-						die ("sudo echo '{$model->rsa_key}' >> {$sshdir}/authorized_keys");
 						exec("sudo echo '{$model->rsa_key}' >> {$sshdir}/authorized_keys");
 					}
 
