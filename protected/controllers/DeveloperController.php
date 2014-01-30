@@ -10,7 +10,7 @@ class DeveloperController extends Controller
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
 		}
     $model=new DeveloperForm('useradd');
-    
+
     $sysgroups = array();
 		$groupfile = fopen('/etc/group','r');
 		if ($groupfile) {
@@ -18,7 +18,7 @@ class DeveloperController extends Controller
 				$gitem = explode (":", fgets($groupfile));
 				if (count($gitem)==4) {
 					if (
-						($gitem[2]>=Yii::app()->params['min_gid']) & 
+						($gitem[2]>=Yii::app()->params['min_gid']) &
 						($gitem[0]!='nobody') &
 						($gitem[0]!='nogroup')
 					) {
@@ -28,7 +28,7 @@ class DeveloperController extends Controller
 			}
 			fclose($groupfile);
 		}
-		
+
 		$model->grouplist = array_fill_keys($sysgroups, FALSE);
 
     if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-add-form')
@@ -100,13 +100,13 @@ class DeveloperController extends Controller
 				foreach(array_keys($model->memberlist) as $member) {
 					if ($model->memberlist[$member] == TRUE) exec ("sudo /usr/sbin/usermod -a -G {$model->group} {$member}");
 				}
-				
+
 				$this->redirect($this->createUrl('/developer/index').'#tab2');
       }
     }
     $this->render('groupadd',array('model'=>$model));
 	}
-	
+
 	public function actionDeleteDeveloper($login)
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -128,7 +128,7 @@ class DeveloperController extends Controller
 			$this->redirect($this->createUrl('/developer/index').'#tab2');
 		}
 	}
-	
+
 	public function actionEditDeveloper($login)
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -146,7 +146,7 @@ class DeveloperController extends Controller
 			$model->password_duplicate = '';
 			$model->grouplist=array();
 			$usrglist = array();
-			
+
 			foreach(explode(" ", exec("id -G $model->login")) as $group) {
 				array_push($usrglist, posix_getgrgid($group)['name']);
 			}
@@ -192,7 +192,7 @@ class DeveloperController extends Controller
 			$user = Yii::app()->user->name;
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
 		}
-		
+
 		$sysusers = array();
 		$pwdfile = fopen('/etc/passwd', 'r');
 		if ($pwdfile) {
@@ -213,14 +213,14 @@ class DeveloperController extends Controller
 								$usergroups = "{$usergroups}, ". posix_getgrgid($usergroup)['name'];
 							}
 						}
-						
+
 						array_push($sysusers, array(
-							'id'=>$pwditem[0], 
-							'uid'=>$pwditem[2], 
-							'gid'=>posix_getgrgid($pwditem[3])['name'], 
-							'groups'=>$usergroups, 
-							'name'=>$pwditem[4], 
-							'home'=>$pwditem[5], 
+							'id'=>$pwditem[0],
+							'uid'=>$pwditem[2],
+							'gid'=>posix_getgrgid($pwditem[3])['name'],
+							'groups'=>$usergroups,
+							'name'=>$pwditem[4],
+							'home'=>$pwditem[5],
 							'shell'=>$pwditem[6]
 						));
 					}
@@ -228,7 +228,7 @@ class DeveloperController extends Controller
 			}
 			fclose($pwdfile);
 		}
-		
+
 		$sysgroups = array();
 		$groupfile = fopen('/etc/group','r');
 		if ($groupfile) {
@@ -236,7 +236,7 @@ class DeveloperController extends Controller
 				$gitem = explode (":", fgets($groupfile));
 				if (count($gitem)==4) {
 					if (
-						($gitem[2]>=Yii::app()->params['min_gid']) & 
+						($gitem[2]>=Yii::app()->params['min_gid']) &
 						($gitem[0]!='nobody') &
 						($gitem[0]!='nogroup')
 					)
@@ -251,7 +251,7 @@ class DeveloperController extends Controller
 			}
 			fclose($groupfile);
 		}
-		
+
 		$devlist = new CArrayDataProvider(
 			$sysusers,
 			array(
@@ -260,7 +260,7 @@ class DeveloperController extends Controller
 			),
 		));
 		$grouplist = new CArrayDataProvider(
-			$sysgroups, 
+			$sysgroups,
 			array(
 				'pagination'=>array(
 				'pageSize'=>25,
@@ -282,12 +282,11 @@ class DeveloperController extends Controller
     $model->password_duplicate = '';
     $model->grouplist=array();
     $usrglist = array();
-    
 
     foreach(explode(" ", exec("id -G $model->login")) as $group) {
 			array_push($usrglist, posix_getgrgid($group)['name']);
     }
-    
+
     $model->grouplist = array_fill_keys($usrglist, true);
 
     if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-profile-form')
@@ -317,6 +316,15 @@ class DeveloperController extends Controller
 						}
 					}
 					exec("sudo /usr/sbin/usermod -c '{$model->username}' {$glist} {$model->login}");
+
+					die($model->rsa_key);
+					if (strlen($model->rsa_key)>0) {
+						$sshdir = posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh";
+						mkdir($sshdir);
+						die ("sudo echo '{$model->rsa_key}' >> {$sshdir}/authorized_keys");
+						exec("sudo echo '{$model->rsa_key}' >> {$sshdir}/authorized_keys");
+					}
+
           Yii::app()->user->setFlash('success','Данные пользователя обновленны');
 					$this->refresh();
         }

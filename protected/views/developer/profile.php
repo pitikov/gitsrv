@@ -6,6 +6,7 @@ $this->breadcrumbs=array(
 	$model->login,
 );
 ?>
+
 <h1><?php echo "Профиль пользователя &quot;$model->login&quot;"; ?></h1>
 
 <div class="form">
@@ -17,12 +18,12 @@ $this->breadcrumbs=array(
 )); ?>
 
 	<p class="note">Поля, отмеченные символом <span class="required">*</span>, обязательны для заполнения.</p>
-	
+
 		<?php echo $form->errorSummary($model); ?>
-		
+
 <?php
 $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Основная информация')); ?>
-	<div class="row"> 
+	<div class="row">
 		<?php echo $form->labelEx($model,'username'); ?>
 		<?php echo $form->textField($model,'username'); ?>
 		<?php echo $form->error($model,'username'); ?>
@@ -45,21 +46,28 @@ $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Основна
 <?php $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Группы')); ?>
 <?php for ($id = 0; $id < count($model->grouplist); $id++) { ?>
 	<h4 class="row">
-		<?php 
+		<?php
 			$gname = array_keys($model->grouplist)[$id];
-			echo  $form->checkBox($model, "grouplist[{$gname}]") . " {$gname}"; 
+			echo  $form->checkBox($model, "grouplist[{$gname}]") . " {$gname}";
 		?>
 	</h4>
 	<?php } ?>
 <?php $this->endWidget(); ?>
+<?php $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'SSH аунтефикация')); ?>
+	<p class="note">Пара ключей должна быть сгенерированна на стороне клиента коммандой <span class="required">ssh-keygen -t rsa</span></p>
 
-<?php 
+		<?php echo $form->labelEx($model,'rsa_key'); ?>
+		<?php echo $form->textArea($model,'rsa_key', array('id'=>'rsa_key_area', 'cols'=>'80', 'rows'=>'10')); ?>
+		<?php echo $form->error($model,'rsa_key'); ?>
+
+<?php $this->endWidget(); ?>
+<?php
 	$tabParameters = array();
 	foreach($this->clips as $key=>$clip) $tabParameters['tab'.(count($tabParameters)+1)] = array('title'=>$key, 'content'=>$clip); // !!
 ?>
 
 <?php $this->widget('system.web.widgets.CTabView', array('tabs'=>$tabParameters)); ?>
-	
+
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton('Сохранить профиль'); ?>
