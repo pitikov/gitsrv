@@ -72,6 +72,7 @@ class ProjectForm extends CFormModel
 		}
 		$usergroup = trim(posix_getgrgid(posix_getpwuid(Yii::app()->user->getId())['gid'])['name']);
 		if (!in_array($usergroup, $group_list, true)) array_push($group_list, $usergroup);
+		if (!in_array($this->group, $group_list, true)) array_push($group_list, $this->group);
 		return array_combine($group_list, $group_list);
 
 	}
