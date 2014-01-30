@@ -29,6 +29,54 @@ class DeveloperController extends Controller
     $this->render('adddeveloper',array('model'=>$model));
 	}
 
+	public function actionAddGroup()
+	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		}
+    $model=new GroupForm;
+    $sysusers = array();
+    $pwdfile = fopen('/etc/passwd','r');
+    if ($pwdfile) {
+			while (!feof($pwdfile)) {
+				$pwditem = explode(":",fgets($pwdfile));
+				if (count($pwditem)==7) {
+					if (
+						($pwditem[1] != "*") &
+						($pwditem[2] >= Yii::app()->params['min_uid']) &
+						($pwditem[0] != 'nobody')
+					) {
+						array_push($sysusers, $pwditem[0]);
+					}
+				}
+			}
+			fclose($pwdfile);
+    }
+    $model->memberlist = array_fill_keys($sysusers, false);
+    if (isset($model->memberlist[Yii::app()->user->name])) $model->memberlist[Yii::app()->user->name] = true;
+
+    if(isset($_POST['ajax']) && $_POST['ajax']==='group-form-groupadd-form')
+    {
+        echo CActiveForm::validate($model);
+        Yii::app()->end();
+    }
+
+    if(isset($_POST['GroupForm']))
+    {
+			$model->attributes=$_POST['GroupForm'];
+      if($model->validate()) {
+				exec("sudo /usr/sbin/groupadd $model->group");
+				foreach(array_keys($model->memberlist) as $member) {
+					if ($model->memberlist[$member] == TRUE) exec ("sudo /usr/sbin/usermod -a -G {$model->group} {$member}");
+				}
+				
+				$this->redirect($this->createUrl('/developer/index').'#tab2');
+      }
+    }
+    $this->render('groupadd',array('model'=>$model));
+	}
+	
 	public function actionDeleteDeveloper($login)
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -38,6 +86,17 @@ class DeveloperController extends Controller
 		$this->render('delete');
 	}
 
+	public function actionDeleteGroup($group)
+	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		} else {
+			exec("sudo /usr/sbin/groupdel {$group}");
+			$this->redirect($this->createUrl('/developer/index').'#tab2');
+		}
+	}
+	
 	public function actionEditDeveloper($login)
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -105,7 +164,7 @@ class DeveloperController extends Controller
 						array_push($sysgroups, array(
 							'id'=>$gitem[0],
 							'gid'=>$gitem[2],
-							'users'=>$gitem[3]
+							'users'=>str_replace(",", ", ", $gitem[3])
 						));
 					}
 				}

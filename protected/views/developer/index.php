@@ -6,8 +6,8 @@ $this->breadcrumbs=array(
 );
 ?>
 <h1>Разработчики и группы</h1>
-<?php
 
+<?php
 
 $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Разработчики')); 
 $this->widget('zii.widgets.grid.CGridView', array(
@@ -40,9 +40,9 @@ $this->widget('zii.widgets.grid.CGridView', array(
 				'header'=>'',
 				'class'=>'DeveloperCtrlColumn',
 			),
-			
     ),
 		'summaryText'=>CHtml::link('<img title="Добавить учетную запись" src="/images/new.png"/>', array('/developer/addDeveloper')).' Учетные записи {start}-{end} из {count}',
+		'emptyText'=>'Учетных записей пользователей не найденно. Вы можете добавить учетную запись '. CHtml::link('<img title="Добавить учетную запись" src="/images/new.png"/>', array('/developer/addDeveloper')),
 	)
 );
 
@@ -71,6 +71,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			),
     ),
 		'summaryText'=>CHtml::link('<img title="Добавить группу" src="/images/new.png"/>', array('/developer/addGroup')).' Группы {start}-{end} из {count}',
+		'emptyText'=>'Групп пользователей не найденно. Вы можете добавить группу '. CHtml::link('<img title="Добавить группу" src="/images/new.png"/>', array('/developer/addGroup')),
 	)
 );
 
