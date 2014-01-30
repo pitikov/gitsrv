@@ -37,7 +37,13 @@ class DeveloperController extends Controller
 
 	public function actionIndex()
 	{
-		$this->render('index');
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		}
+		$grouplist = new CArrayDataProvider(array());
+		$devlist = new CArrayDataProvider(array());
+		$this->render('index', array('devlist'=>$devlist, 'grouplist'=>$grouplist));
 	}
 
 	public function actionView()
