@@ -21,7 +21,6 @@ class DeveloperForm extends CFormModel
 			array('login','loginunique','on'=>'useradd'),
 			array('password, password_duplicate', 'required','on'=>'useradd'),
 			array('password, password_duplicate', 'compare', 'compareAttribute'=>'password_duplicate', 'allowEmpty'=>true, 'strict'=>true, 'on'=>'useradd, usermod'),
-			//array('password', 'compare', 'compareAttribute'=>'password_duplicate', 'on'=>'usermod'),
 			array('grouplist', 'grouplistvalidate'),
 		);
 	}

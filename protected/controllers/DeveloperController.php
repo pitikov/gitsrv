@@ -10,6 +10,26 @@ class DeveloperController extends Controller
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
 		}
     $model=new DeveloperForm('useradd');
+    
+    $sysgroups = array();
+		$groupfile = fopen('/etc/group','r');
+		if ($groupfile) {
+			while (!feof($groupfile)) {
+				$gitem = explode (":", fgets($groupfile));
+				if (count($gitem)==4) {
+					if (
+						($gitem[2]>=Yii::app()->params['min_gid']) & 
+						($gitem[0]!='nobody') &
+						($gitem[0]!='nogroup')
+					) {
+						array_push($sysgroups, $gitem[0]);
+					}
+				}
+			}
+			fclose($groupfile);
+		}
+		
+		$model->grouplist = array_fill_keys($sysgroups, FALSE);
 
     if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-add-form')
     {
@@ -22,7 +42,17 @@ class DeveloperController extends Controller
 			$model->attributes=$_POST['DeveloperForm'];
 			if($model->validate())
 			{
-				// TODO form inputs are valid, do something here
+				$grouplist = false;
+				foreach(array_keys($model->grouplist) as $group) {
+					if ($model->grouplist[$group]) {
+						if ($grouplist == false) $grouplist = "-G $group";
+						else $grouplist = $grouplist.",$group";
+					}
+				}
+				if ($groupfile == false) $grouplist = '';
+				exec ("sudo /usr/sbin/useradd -g users -c '{$model->username}' -k /etc/skel -m -s /usr/bin/git-shell {$grouplist} {$model->login}");
+				exec("echo {$model->login}:{$model->password} | sudo /usr/sbin/chpasswd");
+
 				$this->redirect(array('/developer'));
 			}
     }
@@ -82,8 +112,10 @@ class DeveloperController extends Controller
 		if (Yii::app()->user->getId()!=0) {
 			$user = Yii::app()->user->name;
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		} else {
+			exec("sudo /usr/sbin/userdel -f -r {$login}");
 		}
-		$this->render('delete');
+		$this->redirect($this->createUrl('/developer/index'));
 	}
 
 	public function actionDeleteGroup($group)
