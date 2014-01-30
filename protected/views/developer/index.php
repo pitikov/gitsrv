@@ -9,11 +9,72 @@ $this->breadcrumbs=array(
 <?php
 
 
-$this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Разработчики')); ?>
-<?php $this->endWidget(); ?>
+$this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Разработчики')); 
+$this->widget('zii.widgets.grid.CGridView', array(
+    'dataProvider'=>$devlist,
+    'columns'=>array(
+			array(
+				'name'=>'id',
+				'header'=>'login',
+				'class'=>'DeveloperColumn',
+			),
+			'uid','gid',
+			array(
+				'name'=>'groups',
+				'header'=>'группы',
+			),
+			array(
+				'name'=>'name',
+				'header'=>'имя пользователя',
+			),
+			array(
+				'name'=>'home',
+				'header'=>'домашний каталог',
+			),
+			array(
+				'name'=>'shell',
+				'header'=>'оболочка',
+			),
+			array(
+				'name'=>'id',
+				'header'=>'',
+				'class'=>'DeveloperCtrlColumn',
+			),
+			
+    ),
+		'summaryText'=>CHtml::link('<img title="Добавить учетную запись" src="/images/new.png"/>', array('/developer/addDeveloper')).' Учетные записи {start}-{end} из {count}',
+	)
+);
 
-<?php $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Группы')); ?>
-<?php $this->endWidget(); ?>
+$this->endWidget(); ?>
+
+<?php $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Группы')); 
+$this->widget('zii.widgets.grid.CGridView', array(
+    'dataProvider'=>$grouplist,
+    'columns'=>array(
+			array(
+				'name'=>'id',
+				'header'=>'группа',
+			),
+			array(
+				'name'=>'gid',
+				'header'=>'gid',
+			),
+			array(
+				'name'=>'users',
+				'header'=>'члены группы',
+			),
+			array(
+				'name'=>'id',
+				'header'=>'',
+				'class'=>'GroupCtrlColumn'
+			),
+    ),
+		'summaryText'=>CHtml::link('<img title="Добавить группу" src="/images/new.png"/>', array('/developer/addGroup')).' Группы {start}-{end} из {count}',
+	)
+);
+
+$this->endWidget(); ?>
 
 <?php
 

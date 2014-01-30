@@ -3,8 +3,12 @@
 class DeveloperController extends Controller
 {
 
-	public function actionAdd()
+	public function actionAddDeveloper()
 	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		}
     $model=new DeveloperForm('useradd');
 
     if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-add-form')
@@ -22,16 +26,24 @@ class DeveloperController extends Controller
 				$this->redirect(array('/developer'));
 			}
     }
-    $this->render('add',array('model'=>$model));
+    $this->render('adddeveloper',array('model'=>$model));
 	}
 
-	public function actionDelete()
+	public function actionDeleteDeveloper($login)
 	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		}
 		$this->render('delete');
 	}
 
-	public function actionEdit()
+	public function actionEditDeveloper($login)
 	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		}
 		$this->render('edit');
 	}
 
@@ -41,8 +53,80 @@ class DeveloperController extends Controller
 			$user = Yii::app()->user->name;
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
 		}
-		$grouplist = new CArrayDataProvider(array());
-		$devlist = new CArrayDataProvider(array());
+		
+		$sysusers = array();
+		$pwdfile = fopen('/etc/passwd', 'r');
+		if ($pwdfile) {
+			while (!feof($pwdfile)) {
+				$pwditem = explode(":", fgets($pwdfile));
+				if (count($pwditem)==7) {
+					if (
+						($pwditem[1] != "*") &
+						($pwditem[2] >= Yii::app()->params['min_uid']) &
+						($pwditem[0] != 'nobody')
+					) {
+						$usergrouplist = explode(" ",exec("id -G $pwditem[0]"));
+						$usergroups = false;
+						foreach($usergrouplist as $usergroup) {
+							if ($usergroups == false) {
+								$usergroups = posix_getgrgid($usergroup)['name'];
+							} else {
+								$usergroups = "{$usergroups}, ". posix_getgrgid($usergroup)['name'];
+							}
+						}
+						
+						array_push($sysusers, array(
+							'id'=>$pwditem[0], 
+							'uid'=>$pwditem[2], 
+							'gid'=>posix_getgrgid($pwditem[3])['name'], 
+							'groups'=>$usergroups, 
+							'name'=>$pwditem[4], 
+							'home'=>$pwditem[5], 
+							'shell'=>$pwditem[6]
+						));
+					}
+				}
+			}
+			fclose($pwdfile);
+		}
+		
+		$sysgroups = array();
+		$groupfile = fopen('/etc/group','r');
+		if ($groupfile) {
+			while (!feof($groupfile)) {
+				$gitem = explode (":", fgets($groupfile));
+				if (count($gitem)==4) {
+					if (
+						($gitem[2]>=Yii::app()->params['min_gid']) & 
+						($gitem[0]!='nobody') &
+						($gitem[0]!='nogroup')
+					)
+					{
+						array_push($sysgroups, array(
+							'id'=>$gitem[0],
+							'gid'=>$gitem[2],
+							'users'=>$gitem[3]
+						));
+					}
+				}
+			}
+			fclose($groupfile);
+		}
+		
+		$devlist = new CArrayDataProvider(
+			$sysusers,
+			array(
+				'pagination'=>array(
+				'pageSize'=>25,
+			),
+		));
+		$grouplist = new CArrayDataProvider(
+			$sysgroups, 
+			array(
+				'pagination'=>array(
+				'pageSize'=>25,
+			),
+		));
 		$this->render('index', array('devlist'=>$devlist, 'grouplist'=>$grouplist));
 	}
 
@@ -138,10 +222,8 @@ class DeveloperController extends Controller
   {
     if($error=Yii::app()->errorHandler->error)
     {
-      if(Yii::app()->request->isAjaxRequest)
-	echo $error['message'];
-      else
-	$this->render('error', $error);
+      if(Yii::app()->request->isAjaxRequest) echo $error['message'];
+      else $this->render('error', $error);
     }
   }
 }

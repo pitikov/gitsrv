@@ -1,7 +1,6 @@
 <?php
 
 class ProjectCtrlColumn extends CDataColumn {
-
   protected function renderDataCellContent($row, $data)
   {
 		if ($this->isEditAccess($data['owner'], $data['group'])) {
@@ -18,7 +17,6 @@ class ProjectCtrlColumn extends CDataColumn {
 		if (posix_getgrgid(posix_getpwnam(Yii::app()->user->name)['gid'])['name'] == $group) $retcode = TRUE;
 		if (array_search($owner, posix_getgrnam($group)['members'])) $retcode = TRUE;
 		return $retcode;
-
   }
 
   private function isDeleteAccess($owner)
@@ -29,5 +27,4 @@ class ProjectCtrlColumn extends CDataColumn {
 
 		return $retcode;
   }
-
 }
