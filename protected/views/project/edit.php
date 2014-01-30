@@ -13,7 +13,7 @@ $this->breadcrumbs=array(
 	'enableAjaxValidation'=>true,
 )); ?>
 
-	<h1>Редактирование параметров проекта <?php echo $model->project; ?></h1>
+	<h1>Редактирование параметров проекта &quot;<?php echo $model->project; ?>&quot;</h1>
 	<p class="note">Поля, отмеченные символом <span class="required">*</span>, обязательны для заполнения.</p>
 
 	<?php echo $form->errorSummary($model); ?>
