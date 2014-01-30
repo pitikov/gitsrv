@@ -134,8 +134,56 @@ class DeveloperController extends Controller
 		if (Yii::app()->user->getId()!=0) {
 			$user = Yii::app()->user->name;
 			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		} else {
+			$model=new DeveloperForm('usermod');
+
+			$userinfo = posix_getpwnam($login);
+
+			$model->login = $userinfo['name'];
+			$model->username = $userinfo['gecos'];
+
+			$model->password = '';
+			$model->password_duplicate = '';
+			$model->grouplist=array();
+			$usrglist = array();
+			
+			foreach(explode(" ", exec("id -G $model->login")) as $group) {
+				array_push($usrglist, posix_getgrgid($group)['name']);
+			}
+			$model->grouplist = array_fill_keys($usrglist, true);
+
+			if(isset($_POST['ajax']) && $_POST['ajax']==='developer-form-profile-form')
+			{
+        echo CActiveForm::validate($model);
+        Yii::app()->end();
+			}
+
+			if(isset($_POST['DeveloperForm']))
+			{
+        $model->attributes=$_POST['DeveloperForm'];
+        if($model->validate())
+        {
+
+					if (!is_null($model->password)) {
+						exec("echo {$model->login}:{$model->password} | sudo /usr/sbin/chpasswd");
+					}
+					$glist = '';
+
+					foreach(array_keys($model->grouplist) as $key) {
+						if ($model->grouplist[$key]==TRUE) {
+							if ($glist == '') {
+								$glist = "-G {$key}";
+							} else {
+								$glist = $glist.",{$key}";
+							}
+						}
+					}
+					exec("sudo /usr/sbin/usermod -c '{$model->username}' {$glist} {$model->login}");
+					$this->redirect($this->createUrl('/developer/index'));
+        }
+			}
+			$this->render('edit',array('model'=>$model));
 		}
-		$this->render('edit');
 	}
 
 	public function actionIndex()
@@ -219,11 +267,6 @@ class DeveloperController extends Controller
 			),
 		));
 		$this->render('index', array('devlist'=>$devlist, 'grouplist'=>$grouplist));
-	}
-
-	public function actionView()
-	{
-		$this->render('view');
 	}
 
 	public function actionProfile()
