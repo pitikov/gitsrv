@@ -23,7 +23,7 @@ class ProjectCtrlColumn extends CDataColumn {
   {
 		$retcode = FALSE;
   	if ( Yii::app()->user->getId() == 0 ) $retcode = TRUE;
-  	if ( $owner == Yii::app()->user->name ) $retcode = TRUE;
+  	//if ( $owner == Yii::app()->user->name ) $retcode = TRUE;
 
 		return $retcode;
   }
