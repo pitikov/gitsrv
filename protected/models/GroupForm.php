@@ -15,7 +15,9 @@ class GroupForm extends CFormModel
 		return array(
 			array('group', 'required'),
 			array('group', 'groupunique'),
-			array('memberlist', 'memberlist_not_empty')
+			array('memberlist', 'memberlist_not_empty'),
+			array('group', 'match', 'pattern'=>'/^([a-z,A-Z][a-z,A-Z,0-9]+)$/'),
+			array('group', 'length', 'min'=>3, 'max'=>24),
 		);
 	}
 
@@ -32,7 +34,7 @@ class GroupForm extends CFormModel
 	
 	public function groupunique()
 	{
-		if (posix_getgrnam($this->group) === FALSE) {} else {
+		if (!(posix_getgrnam($this->group)) === FALSE) {
 			$this->addError($this->group, $this->attributeLabels()['group'].' должно быть уникальным');
 		}
 	}
@@ -51,6 +53,4 @@ class GroupForm extends CFormModel
 		}
 		if ($is_empty) $this->addError($this->group, $this->attributeLabels()['memberlist'].' не может быть пустым');
 	}
-	
-	
 }

@@ -20,6 +20,9 @@ class ProjectForm extends CFormModel
 			array('project, owner, group, description', 'required'),
 			array('project', 'project_unique', 'on'=>'create'),
 			array('is_group_create', 'groupadd', 'on'=>'create'),
+			array('project', 'match', 'pattern'=>'/^([a-z,A-Z][a-z,A-Z,0-9]+)$/'),
+			array('project', 'length', 'min'=>4, 'max'=>32),
+
 		);
 	}
 

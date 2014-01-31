@@ -228,3 +228,26 @@ div.search-form
 {
 	background: #80CFFF;
 }
+
+div.doc p {
+	margin: 0.5em;
+	font: 16px Arial;
+}
+
+div.doc h3, div.doc h2 {
+	margin-top: 1em;
+}
+
+div.doc p.code 
+{
+	margin-top:0;
+	padding:5px;
+	padding-left:20px;
+	background: url(/images/code.png) no-repeat;
+	background-position: left center;
+}
+
+p.note 
+{
+	color: black;
+}

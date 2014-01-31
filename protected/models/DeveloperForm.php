@@ -9,6 +9,9 @@ class DeveloperForm extends CFormModel
 	public $grouplist;
 	public $rsakey;
 
+	const WEAK = 0;
+	const STRONG = 1;
+
 	/**
 	 * Declares the validation rules.
 	 * The rules state that username and password are required,
@@ -19,11 +22,14 @@ class DeveloperForm extends CFormModel
 		return array(
 			array('username', 'required'),
 			array('login','required','on'=>'useradd'),
+			array('login', 'match', 'pattern'=>'/^([a-z,A-Z][a-z,A-Z,0-9]+)$/', 'on'=>'useradd'),
+			array('login, username', 'length', 'min'=>4, 'max'=>32),
 			array('login','loginunique','on'=>'useradd'),
 			array('password, password_duplicate', 'required','on'=>'useradd'),
 			array('password, password_duplicate', 'compare', 'compareAttribute'=>'password_duplicate', 'allowEmpty'=>true, 'strict'=>true, 'on'=>'useradd, usermod'),
 			array('grouplist', 'grouplistvalidate'),
 			array('rsakey','type','type'=>'string'),
+//			array('password', 'passwordStrength', 'strength'=>self::STRONG),
 		);
 	}
 
@@ -44,20 +50,8 @@ class DeveloperForm extends CFormModel
 
 	public function loginunique()
 	{
-		$userlist = array();
-		$pwdfile = fopen('/etc/passwd','r');
-		if ($pwdfile) {
-			while (!feof($pwdfile)) {
-			  $userstruct = strtok(fgets($pwdfile, 512),':');
-			  if ($userstruct===FALSE) {
-			  } else {
-					array_push($userlist, $userstruct[0]);
-			  }
-			}
-			fclose($pwdfile);
-			if (array_search($this->login, $userlist)===FALSE) {} else {
-				$this->addError($this->login, 'login должен быть уникальным');
-			}
+		if (count(posix_getpwnam($this->login))>0) {
+			$this->addError($this->login, 'login должен быть уникальным');
 		}
 	}
 
@@ -65,5 +59,15 @@ class DeveloperForm extends CFormModel
 	{
 		// TODO validate group list
 	}
-
+	
+	public function passwordStrength($attribute, $params)
+	{
+    if ($params['strength'] === self::WEAK)
+        $pattern = '/^(?=.*[a-zA-Z0-9]).{5,}$/';  
+    elseif ($params['strength'] === self::STRONG)
+        $pattern = '/^(?=.*\d(?=.*\d))(?=.*[a-zA-Z](?=.*[a-zA-Z])).{5,}$/';  
+ 
+    if(!preg_match($pattern, $this->$attribute))
+      $this->addError($attribute, 'пароль слишком слабый');
+	}
 }

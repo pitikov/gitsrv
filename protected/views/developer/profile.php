@@ -57,7 +57,7 @@ $this->beginWidget('system.web.widgets.CClipWidget', array('id'=>'Основна
 	<p class="note">Пара ключей должна быть сгенерированна на стороне клиента коммандой <span class="required">ssh-keygen -t rsa</span></p>
 
 		<?php echo $form->labelEx($model,'rsakey'); ?>
-		<?php echo $form->textArea($model, 'rsakey', array('rows'=>6, 'cols'=>50)); ?>
+		<?php echo $form->textArea($model, 'rsakey', array('rows'=>10, 'cols'=>100)); ?>
 		<?php echo $form->error($model, 'rsakey'); ?>
 
 <?php $this->endWidget(); ?>
