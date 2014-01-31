@@ -339,7 +339,8 @@ class DeveloperController extends Controller
 							}
 						}
 						if (!$is_key_exists) exec("sudo echo '{$model->rsakey}' >> {$sshdir}/authorized_keys");
-						exec("sudo /usr/bin/chmod 764 {$sshdir} -Rf");
+						exec("sudo /usr/bin/chmod 700 {$sshdir} -Rf");
+						exec("sudo /usr/bin/chmod 600 {$sshdir}/authorized_keys");
 						exec("sudo /usr/bin/chown {$model->login}:users {$sshdir} -Rf");
 					}
 
