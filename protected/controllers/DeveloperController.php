@@ -2,7 +2,14 @@
 
 class DeveloperController extends Controller
 {
-
+	
+	public function actions()
+	{
+	  return array(
+	      'page'=>array('class'=>'CViewAction')
+	  );
+	}
+	
 	public function actionAddDeveloper()
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -317,10 +324,23 @@ class DeveloperController extends Controller
 					}
 					exec("sudo /usr/sbin/usermod -c '{$model->username}' {$glist} {$model->login}");
 
-					if (strlen($model->rsa_key)>0) {
+					if ($model->rsakey!="") {
 						$sshdir = posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh";
-						mkdir($sshdir);
-						exec("sudo echo '{$model->rsa_key}' >> {$sshdir}/authorized_keys");
+						if (array_search('.ssh', scandir(posix_getpwnam(Yii::app()->user->name)['dir']),true)===FALSE) mkdir($sshdir);
+						exec("sudo /usr/bin/chmod 777 -Rf {$sshdir}");
+						$is_key_exists = false;
+						if (!(array_search('authorized_keys', scandir(posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh"),true)===FALSE)) {
+							$fpubkey = fopen("{$sshdir}/authorized_keys",'r');
+							if ($fpubkey) {
+								while (!feof($fpubkey)) {
+									if (fgets($fpubkey) == $model->rsakey) $is_key_exists = true;
+								}
+								fclose($fpubkey);
+							}
+						}
+						if (!$is_key_exists) exec("sudo echo '{$model->rsakey}' >> {$sshdir}/authorized_keys");
+						exec("sudo /usr/bin/chmod 764 {$sshdir} -Rf");
+						exec("sudo /usr/bin/chown {$model->login}:users {$sshdir} -Rf");
 					}
 
           Yii::app()->user->setFlash('success','Данные пользователя обновленны');

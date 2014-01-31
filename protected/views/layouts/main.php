@@ -33,6 +33,7 @@
 				array('label'=>'Разработчики', 'url'=>array('/developer/index'), 'visible'=>!Yii::app()->user->isGuest, 'visible'=>((Yii::app()->user->getId()==0) && !Yii::app()->user->isGuest)),
 				array('label'=>'Проекты', 'url'=>array('/project/index'), 'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'webgit', 'url'=>array('/project/webgit'), 'visible'=>!Yii::app()->user->isGuest),
+				array('label'=>'Справка', 'url'=>array('/developer/page', 'view'=>'help'), 'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'Профиль ('.Yii::app()->user->name.')', 'url'=>array('/developer/profile'),
 				'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'Выйти', 'url'=>array('/developer/logout'),

@@ -7,7 +7,7 @@ class DeveloperForm extends CFormModel
 	public $password;
 	public $password_duplicate;
 	public $grouplist;
-	public $rsa_key;
+	public $rsakey;
 
 	/**
 	 * Declares the validation rules.
@@ -23,6 +23,7 @@ class DeveloperForm extends CFormModel
 			array('password, password_duplicate', 'required','on'=>'useradd'),
 			array('password, password_duplicate', 'compare', 'compareAttribute'=>'password_duplicate', 'allowEmpty'=>true, 'strict'=>true, 'on'=>'useradd, usermod'),
 			array('grouplist', 'grouplistvalidate'),
+			array('rsakey','type','type'=>'string'),
 		);
 	}
 
@@ -37,7 +38,7 @@ class DeveloperForm extends CFormModel
 			'password'=>'Пароль',
 			'password_duplicate'=>'Повторите ввод пароля',
 			'grouplist'=>'Список груп',
-			'rsa_key'=>'открытый ключ (файл ~/.ssh/id_rsa.pub)',
+			'rsakey'=>'открытый ключ (файл ~/.ssh/id_rsa.pub)',
 		);
 	}
 
