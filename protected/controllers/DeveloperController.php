@@ -12,9 +12,8 @@ class DeveloperController extends Controller
 	
 	public function actionGetRessource()
 	{
-		if (Yii::app()->user->getId()!=0) {
-			$user = Yii::app()->user->name;
-			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		if (Yii::app()->user->isGuest) {
+			throw new CHttpException(403,"Только авторизированные пользователи имеют доступ к данному рессурсу");
 		} else {
 			$ressourceList = array();
 			$rscdir = scandir(Yii::app()->basepath."/../ressource");
