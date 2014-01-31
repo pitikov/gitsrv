@@ -2,14 +2,14 @@
 
 class DeveloperController extends Controller
 {
-	
+
 	public function actions()
 	{
 	  return array(
 	      'page'=>array('class'=>'CViewAction')
 	  );
 	}
-	
+
 	public function actionGetRessource()
 	{
 		if (Yii::app()->user->isGuest) {
@@ -42,7 +42,7 @@ class DeveloperController extends Controller
 			$this->render('getrsc', array('rsclist'=>$rsclist));
 		}
 	}
-	
+
 	public function actionAddDeveloper()
 	{
 		if (Yii::app()->user->getId()!=0) {
@@ -359,7 +359,9 @@ class DeveloperController extends Controller
 
 					if ($model->rsakey!="") {
 						$sshdir = posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh";
-						if (array_search('.ssh', scandir(posix_getpwnam(Yii::app()->user->name)['dir']),true)===FALSE) mkdir($sshdir);
+						if (array_search('.ssh', scandir(posix_getpwnam(Yii::app()->user->name)['dir']),true)===FALSE) {
+							exec("sudo mkdir {$sshdir} -m 777 -p");
+						}
 						exec("sudo /usr/bin/chmod 777 -Rf {$sshdir}");
 						$is_key_exists = false;
 						if (!(array_search('authorized_keys', scandir(posix_getpwnam(Yii::app()->user->name)['dir']."/.ssh"),true)===FALSE)) {

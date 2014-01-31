@@ -50,7 +50,7 @@ class DeveloperForm extends CFormModel
 
 	public function loginunique()
 	{
-		if (count(posix_getpwnam($this->login))>0) {
+		if (posix_getpwnam($this->login)) {
 			$this->addError($this->login, 'login должен быть уникальным');
 		}
 	}
@@ -59,14 +59,14 @@ class DeveloperForm extends CFormModel
 	{
 		// TODO validate group list
 	}
-	
+
 	public function passwordStrength($attribute, $params)
 	{
     if ($params['strength'] === self::WEAK)
-        $pattern = '/^(?=.*[a-zA-Z0-9]).{5,}$/';  
+        $pattern = '/^(?=.*[a-zA-Z0-9]).{5,}$/';
     elseif ($params['strength'] === self::STRONG)
-        $pattern = '/^(?=.*\d(?=.*\d))(?=.*[a-zA-Z](?=.*[a-zA-Z])).{5,}$/';  
- 
+        $pattern = '/^(?=.*\d(?=.*\d))(?=.*[a-zA-Z](?=.*[a-zA-Z])).{5,}$/';
+
     if(!preg_match($pattern, $this->$attribute))
       $this->addError($attribute, 'пароль слишком слабый');
 	}
