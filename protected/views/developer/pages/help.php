@@ -3,7 +3,7 @@
 <p class = "note">
 Доступ к репозиториям проекта осуществляется посредством протокола ssh.<br/>
 Формат строки доступа (имя репозитория):</p>
-<p>&lsaquo;USER_NAME&rsaquo;@&lsaquo;SERVER_NAME&rsaquo;:/srv/git/&lsaquo;REPO_NAME&rsaquo;
+<p><?php echo Yii::app()->user->name?>@<?php echo $_SERVER['SERVER_ADDR'];?>:/srv/git/&lsaquo;ИМЯ_РЕПОЗИТОРИЯ&rsaquo;
 </p>
 <h2>Работа с GIT</h2>
 <h3>Настройка Git клиента для идентификации пользователя:</h3>
