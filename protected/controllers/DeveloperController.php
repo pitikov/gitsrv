@@ -10,6 +10,40 @@ class DeveloperController extends Controller
 	  );
 	}
 	
+	public function actionGetRessource()
+	{
+		if (Yii::app()->user->getId()!=0) {
+			$user = Yii::app()->user->name;
+			throw new CHttpException(403,"Пользователь {$user} не имеет доступа к данному рессурсу");
+		} else {
+			$ressourceList = array();
+			$rscdir = scandir(Yii::app()->basepath."/../ressource");
+			if ($rscdir) foreach($rscdir as $file) {
+				if (($file != ".") & ($file != "..") & ($file != ".dirindex")) {
+					array_push($ressourceList, array('id'=>$file, 'size'=>filesize(Yii::app()->basepath."/../ressource/{$file}")/(1000*1000), 'description'=>''));
+				}
+			}
+			if (array_search('.dirindex', $rscdir)) {
+				$dirinfo = fopen(Yii::app()->basepath."/../ressource/.dirindex", 'r');
+				if ($dirinfo) {
+					while (!feof($dirinfo)) {
+						$item = explode(":",fgets($dirinfo));
+						if (count($item)>=2) {
+							for($id = 0 ; $id < count($ressourceList); $id++) {
+								if ($ressourceList[$id]['id']==$item[0]) {
+									$ressourceList[$id]['description']=$item[1];
+								}
+							}
+						}
+					}
+					fclose($dirinfo);
+				}
+			}
+			$rsclist = new CArrayDataProvider($ressourceList);
+			$this->render('getrsc', array('rsclist'=>$rsclist));
+		}
+	}
+	
 	public function actionAddDeveloper()
 	{
 		if (Yii::app()->user->getId()!=0) {

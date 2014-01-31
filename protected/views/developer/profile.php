@@ -2,7 +2,7 @@
 /* @var $this DeveloperController */
 
 $this->breadcrumbs=array(
-	'Разработчик'=>array('/developer'),
+	//'Разработчик'=>array('/developer'),
 	$model->login,
 );
 ?>
